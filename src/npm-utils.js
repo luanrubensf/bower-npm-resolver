@@ -137,7 +137,8 @@ function oldNpmCache(pkg, deferred) {
  * @return {Promise<Object>} The manifest object.
  */
 function getManifest(pkg) {
-  return require('pacote').manifest(pkg).then((pkgJson) => ({
+  const manifestOpts = getManifestOptions();
+  return require('pacote').manifest(pkg, manifestOpts).then((pkgJson) => ({
     integrity: pkgJson._integrity,
     manifest: {
       name: pkgJson.name,
@@ -146,6 +147,26 @@ function getManifest(pkg) {
   }));
 }
 
+/**
+ * Create a configuration object that is passed to the manifest function.
+ * Only the registry config is being passed.
+ *
+ * @return {Object} the manifest configuration object
+*/
+function getManifestOptions() {
+  return {
+    registry: getRegistryConfig(),
+  };
+}
+
+/**
+ * Return the current registry config from NPM
+ *
+ * @return {string} registry
+ */
+function getRegistryConfig() {
+  return npm.config.get('registry');
+}
 /**
  * Run npm cache command and resolve the deferred object with the returned
  * metadata.
